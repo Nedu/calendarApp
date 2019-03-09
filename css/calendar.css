@@ -1,0 +1,100 @@
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    background-color: #F9F9F9;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#calendar {
+    background-color: #FFFFFF;
+    width: 100%;
+}
+
+#mainContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#currentMonthYear {
+    margin-bottom: 1em;
+}
+
+#current {
+    margin: 0.7em;
+}
+
+.empty {
+    background-color: #f5f2f2;
+}
+
+.table-bordered td {
+    text-align: right;
+}
+
+#appointmentContainer {
+    width: 50%;
+}
+
+.timeDivider {
+    text-align: center;
+    margin: 1em auto;
+}
+
+.currentDate {
+    margin: 4em;
+}
+
+#dateImage > img {
+    border: 1px solid #000;
+}
+
+.appointments {
+    text-align: left;
+}
+
+.appointments:hover {
+    cursor: pointer;
+}
+
+.days:hover {
+    cursor: pointer;
+    color: orange;
+}
+
+#appointmentTitle::placeholder, #startingTime::placeholder, #endingTime::placeholder {
+    color: red;
+}
+
+#updateAppointmentTitle, #updateStartingTime, #updateEndingTime {
+    border-color: red;
+}
+
+#appName {
+    text-align: center;
+    margin-top: 1em;
+}
+
+form {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+}

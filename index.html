@@ -2,10 +2,134 @@
 <html lang="en" data-framework="javascript">
 	<head>
 		<meta charset="utf-8">
-		<title>Calendar App</title>
-		<link rel="stylesheet" href="css/calendar.css">
+        <title>Calendar App</title>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="misc/notifications/styles.css">
+        <link rel="stylesheet" href="css/calendar.css">
+        <script src="misc/notifications/index.var.js"></script>
 	</head>
-	<body>
-		<script src="js/calendar.js"></script>
+	<body onload="init()">
+        <div class="wrapper">
+            <nav id="sidebar">
+                <h3 id="appName">Scheduler</h3>
+            </nav>
+            <div id="calendar">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <div class="container-fluid">
+                        <button type="button" id="sidebarCollapse" class="btn btn-info" onclick="toggle()">
+                            <i class="fas fa-align-left">
+                                <span>Toggle Sidebar</span>
+                            </i>
+                        </button>
+                    </div>
+                </nav>
+                <div id="mainContainer">
+                    <div id="currentMonthYear">
+                        <i class="fas fa-angle-left" id="prev" onclick="handlePrev()"></i>
+                        <span id="current"></span>
+                        <i class="fas fa-angle-right" id="next" onclick="handleNext()"></i>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sun</th>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                    <div id="appointmentContainer" style="visibility: hidden;">
+                        <div class="card mb-3">
+                            <div class="row no-gutters">
+                                <div class="col-md-4" id="dateImage">
+                                <!-- <img src="..." class="card-img" alt="..."> -->
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <!-- <h5 class="card-title">Card title</h5>
+                                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+                                        <form method="GET">
+                                            <div class="form-group">
+                                                <span class="required">*</span>
+                                                <input type="text" class="form-control" id="appointmentTitle" aria-describedby="appointmentTitle" placeholder="* New Event Title">                                                    
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="appointmentLocation" aria-describedby="appointmentLocation" placeholder="+ Add Location">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="appointmentDescription" aria-describedby="appointmentDescription" placeholder="+ Add Description">
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="timeDivider">Select Appointment TimeFrame</div>
+                                                <input type="text" class="form-control" id="startingTime" aria-describedby="startingTime" placeholder="* Start time (hh:mm am/pm)" data-toggle="tooltip" data-placement="right" title="Enter your date in hours:minute format. For example, 10:30 or 10:30 pm">
+                                                <div class="timeDivider">to</div>
+                                                <input type="text" class="form-control" id="endingTime" aria-describedby="endingTime" placeholder="* End time (hh:mm am/pm)" data-toggle="tooltip" data-placement="right" title="Enter your date in hours:minute format. For example, 10:30 or 10:30 pm">
+                                            </div>
+                                            <button type="button" class="btn btn-primary" onclick="saveAppointment()">Add Appointment</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="updateAppointment" tabindex="-1" role="dialog" aria-labelledby="updateAppointment" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="date"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="GET" id="updateAppointmentForm">
+                                    <div class="form-group row">
+                                        <label for="updateAppointmentTitle" class="col-sm-3 col-form-label">Title:</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="updateAppointmentTitle" aria-describedby="appointmentTitle" placeholder="* New Event Title" oninput="handleInputChange()">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="updateAppointmentLocation" class="col-sm-3 col-form-label">Location:</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="updateAppointmentLocation" aria-describedby="appointmentLocation" placeholder="+ Add Location" oninput="handleInputChange()">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="updateAppointmentDescription" class="col-sm-3 col-form-label">Description:</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="updateAppointmentDescription" aria-describedby="appointmentDescription" placeholder="+ Add Description" oninput="handleInputChange()">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="timeDivider">Select Appointment TimeFrame</div>
+                                        <input type="text" class="form-control" id="updateStartingTime" aria-describedby="startingTime" oninput="handleInputChange()" placeholder="* Start time (hh:mm am/pm)" data-toggle="tooltip" data-placement="right" title="Enter your date in hours:minute format. For example, 10:30 am or 10:30pm">
+                                        <div class="timeDivider">to</div>
+                                        <input type="text" class="form-control" id="updateEndingTime" aria-describedby="endingTime" oninput="handleInputChange()" placeholder="* End time (hh:mm am/pm)" data-toggle="tooltip" data-placement="right" title="Enter your date in hours:minute format. For example, 10:30 or 10:30 pm">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" onclick="updateAppointment()">Save changes</button>
+                                <button type="button" class="btn btn-secondary" onclick="deleteAppointment()" data-dismiss="modal">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="js/calendar.js"></script>
 	</body>
 </html>
